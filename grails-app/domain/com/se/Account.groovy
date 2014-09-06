@@ -15,4 +15,10 @@ class Account {
             val, obj -> val > 0
         }
     }
+
+    static transients = ['balanceWithCurrency']
+
+    String getBalanceWithCurrency(){
+        return "£$balance"
+    }
 }

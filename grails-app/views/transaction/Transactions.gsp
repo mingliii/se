@@ -22,7 +22,7 @@
     <b><g:actionSubmit action="list" value="Refresh" id="refresh"/> </b>
     <br/>
     ------------------------------------------------------
-    <div class="balance">Balance: </div>
+    <div class="balance">Balance: £0.00</div>
     </g:form>
 
     <div class="transactions" hidden>

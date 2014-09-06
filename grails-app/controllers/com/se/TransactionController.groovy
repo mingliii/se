@@ -21,7 +21,7 @@ class TransactionController {
 
     //ajax call
     def list = {
-        Account account = Account.get(params?.'account.id')
+        Account account = Account.get(params?.'account.id' as Serializable)
         if(account){
             def results = Transaction.findAllByAccount(account).sort(transactionOrder)
             if (!results) {
@@ -31,13 +31,13 @@ class TransactionController {
                     transactions = array {
                         for (Transaction t in results) {
                             transaction ref: t.ref,
-                                    in: (t.amount > 0 ? t.amount + " (from $t.from.name)" : '') ,
-                                    out: t.amount < 0 ? -t.amount + " (to $t.to.name)" : '',
-                                    balance: t.balance,
+                                    in: (t.amount > 0 ? t.amountWithCurrency + " (from $t.from.name)" : '') ,
+                                    out: t.amount < 0 ? t.amountWithCurrency + " (to $t.to.name)" : '',
+                                    balance: t.balanceWithCurrency,
                                     createdTime: t.createdTime.format(DATE_FORMAT)
                         }
                     }
-                    balance = account.balance
+                    balance = account.balanceWithCurrency
                 }
             }
             return

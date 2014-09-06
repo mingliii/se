@@ -13,4 +13,16 @@ class Transaction {
 
     static constraints = {
     }
+
+    static transients = ['balanceWithCurrency', 'amountWithCurrency']
+
+
+    String getBalanceWithCurrency(){
+        return "£$balance"
+    }
+
+    String getAmountWithCurrency(){
+        return "£$amount"
+    }
+
 }
