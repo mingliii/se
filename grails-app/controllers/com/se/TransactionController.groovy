@@ -29,11 +29,10 @@ class TransactionController {
             } else {
                 render(contentType: 'text/json'){
                     transactions = array {
-                        for (t in results) {
-                            Account obj = Account.findAllByTransactions([t] as Set).find {!it.is(account)}
+                        for (Transaction t in results) {
                             transaction ref: t.ref,
-                                    in: (t.amount > 0 ? t.amount : '') + "from ($obj?.name)",
-                                    out: t.amount < 0 ? -t.amount : '' + "to ($obj?.name)",
+                                    in: (t.amount > 0 ? t.amount + " (from $t.from.name)" : '') ,
+                                    out: t.amount < 0 ? -t.amount + " (to $t.to.name)" : '',
                                     balance: t.balance,
                                     createdTime: t.createdTime.format(DATE_FORMAT)
                         }
@@ -43,8 +42,6 @@ class TransactionController {
             }
             return
         }
-
-
         render(text: '')
     }
 }

@@ -13,7 +13,14 @@ class TransactionService {
         Date current = new Date()
         String ref = RandomStringUtils.randomNumeric(10)
         Transaction fromTransaction = [ref: ref, createdTime: current, account: from, amount: -amount, balance: from.balance]
-        Transaction toTransaction = [ref: ref, createdTime: current, account: to, amount: amount,balance: from.balance]
+        Transaction toTransaction = [ref: ref, createdTime: current, account: to, amount: amount,balance: to.balance]
+
+        fromTransaction.from = from
+        fromTransaction.to = to
+
+        toTransaction.from = from
+        toTransaction.to = to
+
         fromTransaction.save(true)
         toTransaction.save(true)
         from.transactions << fromTransaction

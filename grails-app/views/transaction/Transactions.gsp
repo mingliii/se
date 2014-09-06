@@ -15,7 +15,7 @@
 <div>
     <h2>Pay</h2>
     <br/>
-    [ errors go here ]
+    <g:renderErrors bean="${account}"/>
     <g:form>
     <b>Person:</b> <g:select name="account.id" from="${Account.list()}" noSelection='["":"-----select-----"]' optionKey="id"  optionValue="name"/>
     <br/>
