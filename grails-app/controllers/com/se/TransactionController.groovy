@@ -3,9 +3,17 @@ package com.se
 import groovy.text.GStringTemplateEngine
 
 class TransactionController {
-    static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss"
 
-    def engine = new GStringTemplateEngine()
+    private static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss"
+    private def transactionOrder = {obj1, obj2 ->
+        if(obj1.createdTime.before(obj2.createdTime)){
+            return 1
+        }else if(obj1.createdTime.after(obj2.createdTime)){
+            return -1
+        }else{
+            return 0
+        }
+    }
 
     def index = {
         render(view: 'Transactions')
@@ -15,16 +23,17 @@ class TransactionController {
     def list = {
         Account account = Account.get(params?.'account.id')
         if(account){
-            def results = Transaction.findAllByAccount(account)
+            def results = Transaction.findAllByAccount(account).sort(transactionOrder)
             if (!results) {
                 render(text: 'No transactions to show')
             } else {
                 render(contentType: 'text/json'){
                     transactions = array {
                         for (t in results) {
+                            Account obj = Account.findAllByTransactions([t] as Set).find {!it.is(account)}
                             transaction ref: t.ref,
-                                    in: t.amount > 0 ? t.amount : '',
-                                    out: t.amount < 0 ? -t.amount : '',
+                                    in: (t.amount > 0 ? t.amount : '') + "from ($obj?.name)",
+                                    out: t.amount < 0 ? -t.amount : '' + "to ($obj?.name)",
                                     balance: t.balance,
                                     createdTime: t.createdTime.format(DATE_FORMAT)
                         }
@@ -34,29 +43,8 @@ class TransactionController {
             }
             return
         }
+
+
         render(text: '')
     }
-
-    private String generateAjaxTransData(List<Transaction> transactions) {
-        assert transactions
-        StringBuilder sb = new StringBuilder("")
-        for (transaction in transactions) {
-            def binding = [ref        : transaction.ref,
-                           iN         : transaction.amount > 0 ? transaction.amount : '',
-                           ouT        : transaction.amount < 0 ? -transaction.amount : '',
-                           balance    : transaction.account.balance,
-                           createdTime: transaction.createdTime.format("yyyy-MM-dd hh:mm:ss")
-            ]
-            sb.append(engine.createTemplate(TRANSACTION_TABLE_DATA).make(binding))
-        }
-        return sb.toString()
-    }
-
-    private static final String TRANSACTION_TABLE_DATA = '''
-            <td>${ref}</td>
-            <td>${iN}</td>
-            <td>${ouT}</td>
-            <td>${balance}</td>
-            <td>${createdTime}</td>
-'''
 }
